@@ -162,7 +162,6 @@ Create a `.local-serve.yml` file in your project root:
 ```yaml
 # Rails project example
 command: "bin/rails server"
-port: 3000
 env:
   RAILS_ENV: development
   DATABASE_URL: postgres://localhost/myapp_dev
@@ -171,7 +170,6 @@ env:
 ```yaml
 # Node.js/Next.js project example
 command: "npm run dev"
-port: 3000
 env:
   NODE_ENV: development
   API_URL: http://localhost:3001
@@ -180,7 +178,6 @@ env:
 ```yaml
 # Custom command with options
 command: "pnpm dev --turbo --port 3002"
-port: 3002
 ```
 
 ### Global Configuration
@@ -192,7 +189,6 @@ projects:
   # Rails backend
   - path: ~/projects/my-app-backend
     command: bin/rails server
-    port: 3000
     env:
       RAILS_ENV: development
       DATABASE_URL: postgres://localhost/myapp_dev
@@ -200,19 +196,16 @@ projects:
   # Next.js frontend
   - path: ~/projects/my-app-frontend
     command: npm run dev
-    port: 3001
     env:
       NEXT_PUBLIC_API_URL: http://localhost:3000
 
   # React Native admin panel
   - path: ~/projects/my-app-admin
     command: pnpm dev
-    port: 3002
 
   # Express.js middleware
   - path: ~/projects/my-app-middleware
     command: npm run start:dev
-    port: 3003
     env:
       NODE_ENV: development
       LOG_LEVEL: debug
@@ -225,7 +218,6 @@ projects:
 | Option | Description | Example |
 |--------|-------------|---------|
 | `command` | Command to run the dev server | `bin/rails server`, `npm run dev` |
-| `port` | Port number (for documentation) | `3000` |
 | `env` | Environment variables (optional) | `RAILS_ENV: development` |
 
 ## 🔍 Auto-Detection
@@ -255,7 +247,6 @@ When no configuration is found, `local-serve` automatically detects:
 **.local-serve.yml:**
 ```yaml
 command: "bin/rails server -p 3001"
-port: 3001
 env:
   RAILS_ENV: development
   RAILS_LOG_LEVEL: debug
@@ -266,7 +257,6 @@ env:
 **.local-serve.yml:**
 ```yaml
 command: "npm run dev -- --turbo"
-port: 3000
 env:
   NEXT_PUBLIC_API_URL: http://localhost:3001
   NEXT_PUBLIC_FEATURE_FLAG: true
@@ -280,22 +270,18 @@ projects:
   # E-commerce backend
   - path: /Users/john/projects/ecommerce/api
     command: bin/rails server
-    port: 3000
 
   # E-commerce frontend
   - path: /Users/john/projects/ecommerce/web
     command: npm run dev
-    port: 3001
 
   # E-commerce admin dashboard
   - path: /Users/john/projects/ecommerce/admin
     command: pnpm dev
-    port: 3002
 
   # Blog site
   - path: /Users/john/projects/blog
     command: hugo server -D
-    port: 1313
 ```
 
 Now you can run `local-serve` in any of these directories and it will use the right command!

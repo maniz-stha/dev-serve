@@ -79,7 +79,6 @@ class LocalServe
       <<~YAML
         # Local Serve Configuration
         command: "bin/rails server"
-        port: 3000
         # Optional: Add environment variables
         # env:
         #   RAILS_ENV: development
@@ -89,7 +88,6 @@ class LocalServe
       <<~YAML
         # Local Serve Configuration
         command: "npm run dev"
-        port: 3000
         # Optional: Specify alternative commands
         # command: "yarn dev"
         # command: "pnpm dev"
@@ -98,7 +96,6 @@ class LocalServe
       <<~YAML
         # Local Serve Configuration
         command: "npm run dev"
-        port: 3000
         # Optional: Next.js specific options
         # command: "npm run dev -- --turbo"
       YAML
@@ -107,7 +104,6 @@ class LocalServe
         # Local Serve Configuration
         # Specify your development server command
         command: "make dev"
-        port: 3000
         # Optional: Environment variables
         # env:
         #   NODE_ENV: development
