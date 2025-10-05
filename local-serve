@@ -1,0 +1,214 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'yaml'
+require 'json'
+require 'fileutils'
+require 'optparse'
+
+class LocalServe
+  CONFIG_FILENAME = '.local-serve.yml'
+  GLOBAL_CONFIG_PATH = File.expand_path("~/.config/local-serve/config.yml")
+
+  def initialize
+    @current_dir = Dir.pwd
+    @options = {}
+  end
+
+  def run(args)
+    parse_options(args)
+    
+    if @options[:init]
+      init_config
+      return
+    end
+
+    config = load_config
+    command = determine_command(config)
+
+    if command.nil?
+      puts "❌ Could not determine development server command"
+      puts "Run 'local-serve --init' to create a config file"
+      exit 1
+    end
+
+    puts "🚀 Starting development server..."
+    puts "📁 Directory: #{@current_dir}"
+    puts "⚡ Command: #{command}"
+    puts "\n#{'-' * 50}\n\n"
+
+    exec(command)
+  end
+
+  private
+
+  def parse_options(args)
+    OptionParser.new do |opts|
+      opts.banner = "Usage: local-serve [options]"
+
+      opts.on("--init", "Initialize config file in current directory") do
+        @options[:init] = true
+      end
+
+      opts.on("-h", "--help", "Show this help message") do
+        puts opts
+        exit
+      end
+    end.parse!(args)
+  end
+
+  def init_config
+    config_path = File.join(@current_dir, CONFIG_FILENAME)
+    
+    if File.exist?(config_path)
+      puts "⚠️  Config file already exists: #{config_path}"
+      return
+    end
+
+    project_type = detect_project_type
+    template = generate_config_template(project_type)
+
+    File.write(config_path, template)
+    puts "✅ Created config file: #{config_path}"
+    puts "\n📝 Edit the file to customize your development server settings"
+  end
+
+  def generate_config_template(project_type)
+    case project_type
+    when :rails
+      <<~YAML
+        # Local Serve Configuration
+        command: "bin/rails server"
+        port: 3000
+        # Optional: Add environment variables
+        # env:
+        #   RAILS_ENV: development
+        #   DATABASE_URL: postgres://localhost/myapp_dev
+      YAML
+    when :node
+      <<~YAML
+        # Local Serve Configuration
+        command: "npm run dev"
+        port: 3000
+        # Optional: Specify alternative commands
+        # command: "yarn dev"
+        # command: "pnpm dev"
+      YAML
+    when :nextjs
+      <<~YAML
+        # Local Serve Configuration
+        command: "npm run dev"
+        port: 3000
+        # Optional: Next.js specific options
+        # command: "npm run dev -- --turbo"
+      YAML
+    else
+      <<~YAML
+        # Local Serve Configuration
+        # Specify your development server command
+        command: "make dev"
+        port: 3000
+        # Optional: Environment variables
+        # env:
+        #   NODE_ENV: development
+      YAML
+    end
+  end
+
+  def load_config
+    # Check for local config first
+    local_config_path = File.join(@current_dir, CONFIG_FILENAME)
+    if File.exist?(local_config_path)
+      return YAML.load_file(local_config_path)
+    end
+
+    # Check for global config with directory mappings
+    if File.exist?(GLOBAL_CONFIG_PATH)
+      global_config = YAML.load_file(GLOBAL_CONFIG_PATH)
+      if global_config && global_config['projects']
+        current_path = File.expand_path(@current_dir)
+        
+        # Sort projects by path length (longest first) to match most specific path
+        sorted_projects = global_config['projects'].sort_by { |p| -p['path'].length }
+        
+        sorted_projects.each do |project|
+          project_path = File.expand_path(project['path'])
+          
+          # Exact match or current dir is within project path
+          if current_path == project_path || current_path.start_with?("#{project_path}/")
+            return project
+          end
+        end
+      end
+    end
+
+    nil
+  end
+
+  def determine_command(config)
+    # Priority 1: Explicit config
+    return build_command(config) if config && config['command']
+
+    # Priority 2: Auto-detect
+    detect_and_run
+  end
+
+  def build_command(config)
+    cmd = config['command']
+    
+    # Add environment variables if specified
+    if config['env']
+      env_vars = config['env'].map { |k, v| "#{k}=#{v}" }.join(' ')
+      cmd = "#{env_vars} #{cmd}"
+    end
+
+    cmd
+  end
+
+  def detect_and_run
+    project_type = detect_project_type
+
+    case project_type
+    when :rails
+      "bin/rails server"
+    when :nextjs
+      detect_node_dev_command || "npm run dev"
+    when :node
+      detect_node_dev_command || "npm run dev"
+    else
+      nil
+    end
+  end
+
+  def detect_project_type
+    return :rails if File.exist?('Gemfile') && File.exist?('config/application.rb')
+    return :nextjs if File.exist?('next.config.js') || File.exist?('next.config.mjs')
+    return :node if File.exist?('package.json')
+    
+    :unknown
+  end
+
+  def detect_node_dev_command
+    return nil unless File.exist?('package.json')
+
+    begin
+      package_json = JSON.parse(File.read('package.json'))
+      scripts = package_json['scripts'] || {}
+
+      # Common dev script names
+      return "npm run dev" if scripts['dev']
+      return "npm run start:dev" if scripts['start:dev']
+      return "npm run develop" if scripts['develop']
+      return "npm start" if scripts['start']
+    rescue JSON::ParserError
+      nil
+    end
+
+    nil
+  end
+end
+
+# Run the CLI
+if __FILE__ == $0
+  LocalServe.new.run(ARGV)
+end
