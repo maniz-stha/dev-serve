@@ -31,12 +31,12 @@ ruby --version
 Run this one-liner in your terminal:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yourusername/local-serve/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/maniz-stha/local-serve/main/install.sh | bash
 ```
 
 Or using wget:
 ```bash
-wget -qO- https://raw.githubusercontent.com/yourusername/local-serve/main/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/maniz-stha/local-serve/main/install.sh | bash
 ```
 
 This will:
@@ -55,7 +55,7 @@ This will:
 mkdir -p ~/.local/bin
 
 # Download the script (replace with actual URL or copy the file)
-curl -o ~/.local/bin/local-serve https://raw.githubusercontent.com/yourusername/local-serve/main/local-serve
+curl -o ~/.local/bin/local-serve https://raw.githubusercontent.com/maniz-stha/local-serve/main/local-serve
 
 # Or if you have the file locally
 cp local-serve ~/.local/bin/local-serve
