@@ -11,8 +11,8 @@ NC='\033[0m' # No Color
 
 # Configuration
 INSTALL_DIR="$HOME/.local/bin"
-SCRIPT_NAME="local-serve"
-SCRIPT_URL="https://raw.githubusercontent.com/maniz-stha/local-serve/main/local-serve"
+SCRIPT_NAME="dev-serve"
+SCRIPT_URL="https://raw.githubusercontent.com/maniz-stha/dev-serve/main/dev-serve"
 SHELL_CONFIG=""
 
 # Helper functions
@@ -106,7 +106,7 @@ create_install_dir() {
 
 # Download the script
 download_script() {
-    print_step "Downloading local-serve..."
+    print_step "Downloading dev-serve..."
     
     TEMP_FILE=$(mktemp)
     
@@ -181,11 +181,11 @@ add_to_path() {
     # Add PATH export based on shell
     if [ "$SHELL_NAME" = "fish" ]; then
         echo "" >> "$SHELL_CONFIG"
-        echo "# Added by local-serve installer" >> "$SHELL_CONFIG"
+        echo "# Added by dev-serve installer" >> "$SHELL_CONFIG"
         echo "set -gx PATH \$HOME/.local/bin \$PATH" >> "$SHELL_CONFIG"
     else
         echo "" >> "$SHELL_CONFIG"
-        echo "# Added by local-serve installer" >> "$SHELL_CONFIG"
+        echo "# Added by dev-serve installer" >> "$SHELL_CONFIG"
         echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> "$SHELL_CONFIG"
     fi
     
@@ -203,8 +203,8 @@ verify_installation() {
     # Add to PATH temporarily for verification
     export PATH="$INSTALL_DIR:$PATH"
     
-    if command -v local-serve &> /dev/null; then
-        print_success "local-serve is installed and accessible"
+    if command -v dev-serve &> /dev/null; then
+        print_success "dev-serve is installed and accessible"
         
         # Try to run help command
         if "$INSTALL_DIR/$SCRIPT_NAME" --help &> /dev/null; then
@@ -224,7 +224,7 @@ verify_installation() {
 create_config_dir() {
     print_step "Setting up configuration directory..."
     
-    CONFIG_DIR="$HOME/.config/local-serve"
+    CONFIG_DIR="$HOME/.config/dev-serve"
     
     if [ ! -d "$CONFIG_DIR" ]; then
         mkdir -p "$CONFIG_DIR"
@@ -238,7 +238,7 @@ create_config_dir() {
 main() {
     echo ""
     echo "╔═══════════════════════════════════════╗"
-    echo "║   local-serve Installation Script    ║"
+    echo "║   dev-serve Installation Script    ║"
     echo "╚═══════════════════════════════════════╝"
     echo ""
     
@@ -260,13 +260,13 @@ main() {
     echo ""
     
     if [ $VERIFY_STATUS -eq 0 ]; then
-        print_success "local-serve has been successfully installed!"
+        print_success "dev-serve has been successfully installed!"
         echo ""
         echo "Quick Start:"
         echo "  1. Navigate to a project directory"
-        echo "  2. Run: local-serve"
+        echo "  2. Run: dev-serve"
         echo ""
-        echo "For more options, run: local-serve --help"
+        echo "For more options, run: dev-serve --help"
         
         if ! check_path; then
             echo ""
@@ -278,11 +278,11 @@ main() {
         echo ""
         print_warning "Installation completed but verification had issues"
         echo "Try running: source $SHELL_CONFIG"
-        echo "Then verify with: local-serve --help"
+        echo "Then verify with: dev-serve --help"
     fi
     
     echo ""
-    echo "Documentation: https://github.com/maniz-stha/local-serve"
+    echo "Documentation: https://github.com/maniz-stha/dev-serve"
     echo ""
 }
 

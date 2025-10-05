@@ -1,4 +1,4 @@
-# local-serve
+# dev-serve
 
 A smart command-line tool that automatically detects and runs development servers for your projects. Say goodbye to remembering different commands for Rails, Node.js, Next.js, and other project types!
 
@@ -31,17 +31,17 @@ ruby --version
 Run this one-liner in your terminal:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/maniz-stha/local-serve/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/maniz-stha/dev-serve/main/install.sh | bash
 ```
 
 Or using wget:
 ```bash
-wget -qO- https://raw.githubusercontent.com/maniz-stha/local-serve/main/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/maniz-stha/dev-serve/main/install.sh | bash
 ```
 
 This will:
-1. Download the `local-serve` script
-2. Install it to `~/.local/bin/local-serve`
+1. Download the `dev-serve` script
+2. Install it to `~/.local/bin/dev-serve`
 3. Make it executable
 4. Add it to your PATH if needed
 5. Verify the installation
@@ -55,13 +55,13 @@ This will:
 mkdir -p ~/.local/bin
 
 # Download the script (replace with actual URL or copy the file)
-curl -o ~/.local/bin/local-serve https://raw.githubusercontent.com/maniz-stha/local-serve/main/local-serve
+curl -o ~/.local/bin/dev-serve https://raw.githubusercontent.com/maniz-stha/dev-serve/main/dev-serve
 
 # Or if you have the file locally
-cp local-serve ~/.local/bin/local-serve
+cp dev-serve ~/.local/bin/dev-serve
 
 # Make it executable
-chmod +x ~/.local/bin/local-serve
+chmod +x ~/.local/bin/dev-serve
 ```
 
 #### Step 2: Add to PATH
@@ -89,7 +89,7 @@ source ~/.config/fish/config.fish
 #### Step 3: Verify Installation
 
 ```bash
-local-serve --help
+dev-serve --help
 ```
 
 If you see the help message, you're all set! 🎉
@@ -98,8 +98,8 @@ If you see the help message, you're all set! 🎉
 
 **Command not found after installation:**
 1. Make sure you've sourced your shell config: `source ~/.bashrc` (or `~/.zshrc`)
-2. Verify the file exists: `ls -la ~/.local/bin/local-serve`
-3. Check if it's executable: `chmod +x ~/.local/bin/local-serve`
+2. Verify the file exists: `ls -la ~/.local/bin/dev-serve`
+3. Check if it's executable: `chmod +x ~/.local/bin/dev-serve`
 4. Restart your terminal
 
 **Ruby not found:**
@@ -117,12 +117,12 @@ Simply navigate to your project directory and run:
 
 ```bash
 cd ~/projects/my-rails-app
-local-serve
+dev-serve
 ```
 
-That's it! `local-serve` will:
-1. Check for a local config file (`.local-serve.yml`)
-2. Check your global config (`~/.config/local-serve/config.yml`)
+That's it! `dev-serve` will:
+1. Check for a local config file (`.dev-serve.yml`)
+2. Check your global config (`~/.config/dev-serve/config.yml`)
 3. Auto-detect the project type and run the appropriate command
 
 ### Initialize Project Config
@@ -131,15 +131,15 @@ Create a project-specific configuration:
 
 ```bash
 cd ~/projects/my-project
-local-serve --init
+dev-serve --init
 ```
 
-This creates a `.local-serve.yml` file in your current directory with smart defaults based on your project type.
+This creates a `.dev-serve.yml` file in your current directory with smart defaults based on your project type.
 
 ### Command Line Options
 
 ```bash
-local-serve [options]
+dev-serve [options]
 
 Options:
   --init          Initialize config file in current directory
@@ -150,14 +150,14 @@ Options:
 
 ### Configuration Priority
 
-`local-serve` checks configurations in this order:
-1. **Local config** (`.local-serve.yml` in project root) - Highest priority
-2. **Global config** (`~/.config/local-serve/config.yml`) - Path-based matching
+`dev-serve` checks configurations in this order:
+1. **Local config** (`.dev-serve.yml` in project root) - Highest priority
+2. **Global config** (`~/.config/dev-serve/config.yml`) - Path-based matching
 3. **Auto-detection** - Fallback based on project type
 
 ### Local Configuration
 
-Create a `.local-serve.yml` file in your project root:
+Create a `.dev-serve.yml` file in your project root:
 
 ```yaml
 # Rails project example
@@ -182,7 +182,7 @@ command: "pnpm dev --turbo --port 3002"
 
 ### Global Configuration
 
-Manage multiple projects from a single file at `~/.config/local-serve/config.yml`:
+Manage multiple projects from a single file at `~/.config/dev-serve/config.yml`:
 
 ```yaml
 projects:
@@ -222,7 +222,7 @@ projects:
 
 ## 🔍 Auto-Detection
 
-When no configuration is found, `local-serve` automatically detects:
+When no configuration is found, `dev-serve` automatically detects:
 
 ### Rails Projects
 - **Detection**: Looks for `Gemfile` and `config/application.rb`
@@ -244,7 +244,7 @@ When no configuration is found, `local-serve` automatically detects:
 
 ### Example 1: Rails API with Custom Port
 
-**.local-serve.yml:**
+**.dev-serve.yml:**
 ```yaml
 command: "bin/rails server -p 3001"
 env:
@@ -254,7 +254,7 @@ env:
 
 ### Example 2: Next.js with Turbopack
 
-**.local-serve.yml:**
+**.dev-serve.yml:**
 ```yaml
 command: "npm run dev -- --turbo"
 env:
@@ -264,7 +264,7 @@ env:
 
 ### Example 3: Multiple Projects in Global Config
 
-**~/.config/local-serve/config.yml:**
+**~/.config/dev-serve/config.yml:**
 ```yaml
 projects:
   # E-commerce backend
@@ -284,7 +284,7 @@ projects:
     command: hugo server -D
 ```
 
-Now you can run `local-serve` in any of these directories and it will use the right command!
+Now you can run `dev-serve` in any of these directories and it will use the right command!
 
 ### Example 4: Monorepo Setup
 
@@ -308,7 +308,7 @@ projects:
 
 ### Using with Different Package Managers
 
-`local-serve` works with any package manager:
+`dev-serve` works with any package manager:
 
 ```yaml
 # npm
@@ -380,15 +380,15 @@ MIT License - feel free to use this project however you'd like!
 ## 🐛 Troubleshooting
 
 ### Command not found
-- Verify installation: `which local-serve`
+- Verify installation: `which dev-serve`
 - Check PATH: `echo $PATH | grep .local/bin`
 - Re-source your shell config: `source ~/.bashrc` or `source ~/.zshrc`
 
 ### Wrong command being executed
-1. Check for local config: `ls -la .local-serve.yml`
-2. Check global config: `cat ~/.config/local-serve/config.yml`
+1. Check for local config: `ls -la .dev-serve.yml`
+2. Check global config: `cat ~/.config/dev-serve/config.yml`
 3. Verify path matching - more specific paths are matched first
-4. Remember: Local config (`.local-serve.yml`) always takes priority
+4. Remember: Local config (`.dev-serve.yml`) always takes priority
 
 ### YAML parsing errors
 - Ensure consistent indentation (2 spaces, not tabs)
@@ -397,13 +397,13 @@ MIT License - feel free to use this project however you'd like!
 
 ### Permission denied
 ```bash
-chmod +x ~/.local/bin/local-serve
+chmod +x ~/.local/bin/dev-serve
 ```
 
 ## 💡 Tips & Tricks
 
-1. **Project Templates**: Create a `.local-serve.yml` template and copy it to new projects
-2. **Team Sharing**: Commit `.local-serve.yml` to your repository for team consistency
+1. **Project Templates**: Create a `.dev-serve.yml` template and copy it to new projects
+2. **Team Sharing**: Commit `.dev-serve.yml` to your repository for team consistency
 3. **Quick Switching**: Use the global config to quickly switch between projects
 4. **Debugging**: Add `set -x` at the top of the script to see what's being executed
 5. **Multiple Configs**: Use local configs for project-specific settings and global config for shared settings

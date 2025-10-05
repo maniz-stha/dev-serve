@@ -6,9 +6,9 @@ require 'json'
 require 'fileutils'
 require 'optparse'
 
-class LocalServe
-  CONFIG_FILENAME = '.local-serve.yml'
-  GLOBAL_CONFIG_PATH = File.expand_path("~/.config/local-serve/config.yml")
+class DevServe
+  CONFIG_FILENAME = '.dev-serve.yml'
+  GLOBAL_CONFIG_PATH = File.expand_path("~/.config/dev-serve/config.yml")
 
   def initialize
     @current_dir = Dir.pwd
@@ -28,7 +28,7 @@ class LocalServe
 
     if command.nil?
       puts "❌ Could not determine development server command"
-      puts "Run 'local-serve --init' to create a config file"
+      puts "Run 'dev-serve --init' to create a config file"
       exit 1
     end
 
@@ -44,7 +44,7 @@ class LocalServe
 
   def parse_options(args)
     OptionParser.new do |opts|
-      opts.banner = "Usage: local-serve [options]"
+      opts.banner = "Usage: dev-serve [options]"
 
       opts.on("--init", "Initialize config file in current directory") do
         @options[:init] = true
@@ -206,5 +206,5 @@ end
 
 # Run the CLI
 if __FILE__ == $0
-  LocalServe.new.run(ARGV)
+  DevServe.new.run(ARGV)
 end
