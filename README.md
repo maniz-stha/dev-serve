@@ -8,6 +8,7 @@ A smart command-line tool that automatically detects and runs development server
 - ⚙️ **Flexible Configuration** - Override defaults with local or global config files
 - 🎯 **Smart Detection** - Reads `package.json` scripts and identifies project types
 - 🌍 **Multi-Project Support** - Manage all your projects from a single global config
+- 🏷️ **Named Projects** - Start servers by project name from anywhere
 - 🔧 **Environment Variables** - Set environment variables per project
 - 📦 **Lightweight** - Single Ruby script, no dependencies
 
@@ -113,11 +114,19 @@ If you see the help message, you're all set! 🎉
 
 ### Basic Usage
 
-Simply navigate to your project directory and run:
+#### Option 1: Run from Project Directory
+Navigate to your project directory and run:
 
 ```bash
 cd ~/projects/my-rails-app
 dev-serve
+```
+
+#### Option 2: Run by Project Name (NEW!)
+Start any project from anywhere using its name:
+
+```bash
+dev-serve my-app-backend
 ```
 
 That's it! `dev-serve` will:
@@ -139,11 +148,16 @@ This creates a `.dev-serve.yml` file in your current directory with smart defaul
 ### Command Line Options
 
 ```bash
-dev-serve [options]
+dev-serve [project-name] [options]
 
 Options:
   --init          Initialize config file in current directory
   -h, --help      Show help message
+
+Examples:
+  dev-serve                    # Run server in current directory
+  dev-serve my-app-backend     # Run server for named project
+  dev-serve --init             # Initialize config file
 ```
 
 ## ⚙️ Configuration
@@ -188,6 +202,7 @@ Manage multiple projects from a single file at `~/.config/dev-serve/config.yml`:
 projects:
   # Rails backend
   - path: ~/projects/my-app-backend
+    name: my-app-backend
     command: bin/rails server
     env:
       RAILS_ENV: development
@@ -195,16 +210,19 @@ projects:
 
   # Next.js frontend
   - path: ~/projects/my-app-frontend
+    name: my-app-frontend
     command: npm run dev
     env:
       NEXT_PUBLIC_API_URL: http://localhost:3000
 
   # React Native admin panel
   - path: ~/projects/my-app-admin
+    name: my-app-admin
     command: pnpm dev
 
   # Express.js middleware
   - path: ~/projects/my-app-middleware
+    name: my-app-middleware
     command: npm run start:dev
     env:
       NODE_ENV: development
@@ -213,10 +231,45 @@ projects:
 
 **Important**: Use absolute paths in the global config. The `~` character will be expanded automatically.
 
+### Named Projects
+
+With named projects, you can start any development server from anywhere by using the project name:
+
+```bash
+# From any directory, start your Rails backend
+dev-serve my-app-backend
+
+# Start your Next.js frontend
+dev-serve my-app-frontend
+
+# Start your admin panel
+dev-serve my-app-admin
+```
+
+The script will:
+1. Look up the project in your global config by name
+2. Change to the project directory
+3. Run the configured command
+
+If a project name is not found, the script will show you all available projects:
+
+```bash
+$ dev-serve unknown-project
+❌ Project 'unknown-project' not found in global config
+Available projects:
+  - my-app-backend (~/projects/my-app-backend)
+  - my-app-frontend (~/projects/my-app-frontend)
+  - my-app-admin (~/projects/my-app-admin)
+
+Check your global config at ~/.config/dev-serve/config.yml
+```
+
 ### Configuration Options
 
 | Option | Description | Example |
 |--------|-------------|---------|
+| `path` | Project directory path | `~/projects/my-app` |
+| `name` | Project name for running by name | `my-app-backend` |
 | `command` | Command to run the dev server | `bin/rails server`, `npm run dev` |
 | `env` | Environment variables (optional) | `RAILS_ENV: development` |
 
@@ -417,7 +470,7 @@ Found a bug? Have a feature request?
 ## 🎯 Roadmap
 
 - [ ] Support for `.env` file loading
-- [ ] Project aliases (run by name instead of path)
+- [x] Project aliases (run by name instead of path) ✅
 - [ ] Multi-command support (run multiple servers)
 - [ ] Interactive project selector
 - [ ] Health check and auto-restart
