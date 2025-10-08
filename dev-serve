@@ -13,6 +13,7 @@ class DevServe
   def initialize
     @current_dir = Dir.pwd
     @options = {}
+    @project_name = nil
   end
 
   def run(args)
@@ -33,6 +34,9 @@ class DevServe
     end
 
     puts "🚀 Starting development server..."
+    if @project_name
+      puts "📦 Project: #{@project_name}"
+    end
     puts "📁 Directory: #{@current_dir}"
     puts "⚡ Command: #{command}"
     puts "\n#{'-' * 50}\n\n"
@@ -44,7 +48,7 @@ class DevServe
 
   def parse_options(args)
     OptionParser.new do |opts|
-      opts.banner = "Usage: dev-serve [options]"
+      opts.banner = "Usage: dev-serve [project-name] [options]"
 
       opts.on("--init", "Initialize config file in current directory") do
         @options[:init] = true
@@ -52,9 +56,18 @@ class DevServe
 
       opts.on("-h", "--help", "Show this help message") do
         puts opts
+        puts "\nExamples:"
+        puts "  dev-serve                    # Run server in current directory"
+        puts "  dev-serve my-app-backend     # Run server for named project"
+        puts "  dev-serve --init             # Initialize config file"
         exit
       end
     end.parse!(args)
+    
+    # Check if first argument is a project name (not an option)
+    if args.any? && !args.first.start_with?('-')
+      @project_name = args.first
+    end
   end
 
   def init_config
@@ -112,6 +125,11 @@ class DevServe
   end
 
   def load_config
+    # If project name is provided, look it up in global config
+    if @project_name
+      return find_project_by_name(@project_name)
+    end
+
     # Check for local config first
     local_config_path = File.join(@current_dir, CONFIG_FILENAME)
     if File.exist?(local_config_path)
@@ -139,6 +157,40 @@ class DevServe
     end
 
     nil
+  end
+
+  def find_project_by_name(project_name)
+    return nil unless File.exist?(GLOBAL_CONFIG_PATH)
+
+    global_config = YAML.load_file(GLOBAL_CONFIG_PATH)
+    return nil unless global_config && global_config['projects']
+
+    # Find project by name
+    project = global_config['projects'].find { |p| p['name'] == project_name }
+    
+    if project
+      # Change to the project directory
+      project_path = File.expand_path(project['path'])
+      unless Dir.exist?(project_path)
+        puts "❌ Project directory not found: #{project_path}"
+        puts "Please check your global config at #{GLOBAL_CONFIG_PATH}"
+        exit 1
+      end
+      
+      # Update current directory to the project directory
+      @current_dir = project_path
+      Dir.chdir(project_path)
+      
+      return project
+    else
+      puts "❌ Project '#{project_name}' not found in global config"
+      puts "Available projects:"
+      global_config['projects'].each do |p|
+        puts "  - #{p['name'] || 'unnamed'} (#{p['path']})"
+      end
+      puts "\nCheck your global config at #{GLOBAL_CONFIG_PATH}"
+      exit 1
+    end
   end
 
   def determine_command(config)
