@@ -10,6 +10,7 @@ A smart command-line tool that automatically detects and runs development server
 - 🌍 **Multi-Project Support** - Manage all your projects from a single global config
 - 🏷️ **Named Projects** - Start servers by project name from anywhere
 - 🔧 **Environment Variables** - Set environment variables per project
+- ⚡ **Pre-Commands** - Run setup commands (like `git pull`) before starting the server
 - 📦 **Lightweight** - Single Ruby script, no dependencies
 
 ## 🎬 Quick Start
@@ -151,13 +152,15 @@ This creates a `.dev-serve.yml` file in your current directory with smart defaul
 dev-serve [project-name] [options]
 
 Options:
-  --init          Initialize config file in current directory
-  -h, --help      Show help message
+  --init              Initialize config file in current directory
+  --run-pre-command   Run the 'pre-command' (if configured) before starting the server
+  -h, --help          Show help message
 
 Examples:
-  dev-serve                    # Run server in current directory
-  dev-serve my-app-backend     # Run server for named project
-  dev-serve --init             # Initialize config file
+  dev-serve                        # Run server in current directory
+  dev-serve my-app-backend         # Run server for named project
+  dev-serve --init                 # Initialize config file
+  dev-serve my-app-backend --run-pre-command # Run 'pre-command' then start server
 ```
 
 ## ⚙️ Configuration
@@ -176,6 +179,7 @@ Create a `.dev-serve.yml` file in your project root:
 ```yaml
 # Rails project example
 command: "bin/rails server"
+pre-command: "git pull origin main"  # Optional: run before starting server
 env:
   RAILS_ENV: development
   DATABASE_URL: postgres://localhost/myapp_dev
@@ -204,6 +208,7 @@ projects:
   - path: ~/projects/my-app-backend
     name: my-app-backend
     command: bin/rails server
+    pre-command: git pull origin main  # Optional: run before starting server
     env:
       RAILS_ENV: development
       DATABASE_URL: postgres://localhost/myapp_dev
@@ -271,6 +276,7 @@ Check your global config at ~/.config/dev-serve/config.yml
 | `path` | Project directory path | `~/projects/my-app` |
 | `name` | Project name for running by name | `my-app-backend` |
 | `command` | Command to run the dev server | `bin/rails server`, `npm run dev` |
+| `pre-command` | Command to run before starting server (optional) | `git pull origin main`, `npm install` |
 | `env` | Environment variables (optional) | `RAILS_ENV: development` |
 
 ## 🔍 Auto-Detection
@@ -357,6 +363,36 @@ projects:
     command: npm run dev --workspace=api
 ```
 
+### Example 5: Using Pre-Command
+
+Run setup commands before starting your development server:
+
+**~/.config/dev-serve/config.yml:**
+```yaml
+projects:
+  - path: /Users/john/projects/apps/admin
+    name: admin
+    command: bin/rails server
+    pre-command: git pull origin main
+```
+
+Then run:
+```bash
+dev-serve admin --run-pre-command
+```
+
+This will:
+1. Run `git pull origin main` first
+2. Then start `bin/rails server`
+
+**Local config example (.dev-serve.yml):**
+```yaml
+command: "npm run dev"
+pre-command: "git pull && npm install"
+```
+
+Use `--run-pre-command` to execute the pre-command before starting the server. If the pre-command fails, the server won't start.
+
 ## 🛠️ Advanced Usage
 
 ### Using with Different Package Managers
@@ -401,12 +437,30 @@ command: "make dev"
 command: "docker-compose up"
 ```
 
+### Pre-Commands
+
+Run setup commands before starting your development server. Use the `--run-pre-command` flag to execute the pre-command:
+
+```yaml
+command: "bin/rails server"
+pre-command: "git pull origin main"
+```
+
+Common use cases:
+- Pull latest changes: `pre-command: git pull origin main`
+- Install dependencies: `pre-command: npm install`
+- Run migrations: `pre-command: bin/rails db:migrate`
+- Multiple commands: `pre-command: "git pull && npm install"`
+
+**Important**: The pre-command only runs when you use the `--run-pre-command` flag. If the pre-command fails (non-zero exit code), the server won't start.
+
 ### Environment Variables
 
 Set environment variables that will be available to your development server:
 
 ```yaml
 command: "bin/rails server"
+pre-command: "git pull origin main"  # Optional
 env:
   RAILS_ENV: development
   DATABASE_URL: postgres://localhost/myapp_dev
