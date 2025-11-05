@@ -33,6 +33,30 @@ class DevServe
       exit 1
     end
 
+    # Run pre-command if requested and configured
+    if @options[:run_pre_command]
+      if config && config['pre-command']
+        pre_command = config['pre-command']
+        puts "🔧 Running pre-command..."
+        puts "⚡ Pre-command: #{pre_command}"
+        puts "\n#{'-' * 50}\n"
+        
+        # Run the pre-command and check exit status
+        success = system(pre_command)
+        unless success
+          puts "\n❌ Pre-command failed with exit code #{$?.exitstatus}"
+          exit $?.exitstatus
+        end
+        
+        puts "\n✅ Pre-command completed successfully"
+        puts "\n#{'-' * 50}\n\n"
+      else
+        puts "⚠️  --run-pre-command flag specified but no 'pre-command' configured"
+        puts "Add a 'pre-command' key to your project config to use this feature"
+        puts "\n#{'-' * 50}\n\n"
+      end
+    end
+
     puts "🚀 Starting development server..."
     if @project_name
       puts "📦 Project: #{@project_name}"
@@ -54,12 +78,17 @@ class DevServe
         @options[:init] = true
       end
 
+      opts.on("--run-pre-command", "Run the 'pre-command' (if configured) before starting the server") do
+        @options[:run_pre_command] = true
+      end
+
       opts.on("-h", "--help", "Show this help message") do
         puts opts
         puts "\nExamples:"
         puts "  dev-serve                    # Run server in current directory"
         puts "  dev-serve my-app-backend     # Run server for named project"
         puts "  dev-serve --init             # Initialize config file"
+        puts "  dev-serve fluid --run-pre-command # Run 'pre-command' then start server"
         exit
       end
     end.parse!(args)
